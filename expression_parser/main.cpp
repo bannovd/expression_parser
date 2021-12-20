@@ -11,7 +11,8 @@ int main()
 
     cout << "Floating-point parser.  ";
     cout << "Enter a period to stop\n";
-    for (;;) {
+    while (true)
+    {
         cout << "Enter expression: ";
         cin.getline(expstr, 79);
         if (*expstr == '.')

@@ -15,7 +15,7 @@ template <class PType> class parser
 {
     char* exp_ptr;  // points to the expression
     char token[80]; // holds current token
-    char tok_type;  // holds token's type
+    char token_type;  // holds token's type
     PType vars[NUMVARS]; // holds variable's values
 
     void eval_exp1(PType& result);
@@ -25,7 +25,8 @@ template <class PType> class parser
     void eval_exp5(PType& result);
     void eval_exp6(PType& result);
     void atom(PType& result);
-    void get_token(), putback();
+    void get_token();
+    void putback();
     void serror(int error);
     PType find_var(char* s);
     int isdelim(char c);
@@ -67,14 +68,14 @@ template <class PType> PType parser<PType>::eval_exp(char* exp)
 template <class PType> void parser<PType>::eval_exp1(PType& result)
 {
     int slot;
-    char ttok_type;
+    char temp_token_type;
     char temp_token[80];
 
-    if (tok_type == VARIABLE)
+    if (token_type == VARIABLE)
     {
         // save old token
-        strcpy(temp_token, token);
-        ttok_type = tok_type;
+        strcpy_s(temp_token, token);
+        temp_token_type = token_type;
 
         // compute the index of the variable
         slot = toupper(*token) - 'A';
@@ -84,8 +85,8 @@ template <class PType> void parser<PType>::eval_exp1(PType& result)
         {
             putback(); // return current token
             // restore old token - not assignment
-            strcpy(token, temp_token);
-            tok_type = ttok_type;
+            strcpy_s(token, temp_token);
+            token_type = temp_token_type;
         }
         else
         {
@@ -102,7 +103,7 @@ template <class PType> void parser<PType>::eval_exp1(PType& result)
 // Add or subtract two terms
 template <class PType> void parser<PType>::eval_exp2(PType& result)
 {
-    register char op;
+    char op;
     PType temp;
 
     eval_exp3(result);
@@ -125,7 +126,7 @@ template <class PType> void parser<PType>::eval_exp2(PType& result)
 // Multiply or divide two factors
 template <class PType> void parser<PType>::eval_exp3(PType& result)
 {
-    register char op;
+    char op;
     PType temp;
 
     eval_exp4(result);
@@ -151,7 +152,7 @@ template <class PType> void parser<PType>::eval_exp3(PType& result)
 template <class PType> void parser<PType>::eval_exp4(PType& result)
 {
     PType temp, ex;
-    register int t;
+    int t;
 
     eval_exp5(result);
     if (*token == '^')
@@ -174,10 +175,10 @@ template <class PType> void parser<PType>::eval_exp4(PType& result)
 // Evaluate a unary + or -
 template <class PType> void parser<PType>::eval_exp5(PType& result)
 {
-    register char  op;
+    char  op;
 
     op = 0;
-    if ((tok_type == DELIMITER) && *token == '+' || *token == '-')
+    if ((token_type == DELIMITER) && *token == '+' || *token == '-')
     {
         op = *token;
         get_token();
@@ -208,7 +209,7 @@ template <class PType> void parser<PType>::eval_exp6(PType& result)
 // Get the value of a number or a variable
 template <class PType> void parser<PType>::atom(PType& result)
 {
-    switch (tok_type)
+    switch (token_type)
     {
     case VARIABLE:
         result = find_var(token);
@@ -237,7 +238,7 @@ template <class PType> void parser<PType>::putback()
 // Display a syntax error
 template <class PType> void parser<PType>::serror(int error)
 {
-    static char* e[] =
+    static string e[] =
     {
         "Syntax error",
         "Unbalanced parentheses",
@@ -249,9 +250,9 @@ template <class PType> void parser<PType>::serror(int error)
 // Obtain the next token
 template <class PType> void parser<PType>::get_token()
 {
-    register char* temp;
+    char* temp;
 
-    tok_type = 0;
+    token_type = 0;
     temp = token;
     *temp = '\0';
 
@@ -267,7 +268,7 @@ template <class PType> void parser<PType>::get_token()
 
     if (strchr("+-*/%^=()", *exp_ptr))
     {
-        tok_type = DELIMITER;
+        token_type = DELIMITER;
         // advance to next char
         *temp++ = *exp_ptr++;
     }
@@ -277,7 +278,7 @@ template <class PType> void parser<PType>::get_token()
         {
             *temp++ = *exp_ptr++;
         }
-        tok_type = VARIABLE;
+        token_type = VARIABLE;
     }
     else if (isdigit(*exp_ptr))
     {
@@ -285,7 +286,7 @@ template <class PType> void parser<PType>::get_token()
         {
             *temp++ = *exp_ptr++;
         }
-        tok_type = NUMBER;
+        token_type = NUMBER;
     }
 
     *temp = '\0';
