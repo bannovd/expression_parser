@@ -44,7 +44,7 @@ template <class PType> parser<PType>::parser()
     }
 }
 
-// Parser entry point.
+// Parser entry point
 template <class PType> PType parser<PType>::eval_exp(char* exp)
 {
     PType result;
@@ -56,11 +56,14 @@ template <class PType> PType parser<PType>::eval_exp(char* exp)
         return (PType)0;
     }
     eval_exp1(result);
-    if (*token) serror(0); // last token must be null
+    if (*token) 
+    {
+        serror(0); // last token must be null
+    }
     return result;
 }
 
-// Process an assignment.
+// Process an assignment
 template <class PType> void parser<PType>::eval_exp1(PType& result)
 {
     int slot;
@@ -96,7 +99,7 @@ template <class PType> void parser<PType>::eval_exp1(PType& result)
     eval_exp2(result);
 }
 
-// Add or subtract two terms.
+// Add or subtract two terms
 template <class PType> void parser<PType>::eval_exp2(PType& result)
 {
     register char op;
@@ -119,7 +122,7 @@ template <class PType> void parser<PType>::eval_exp2(PType& result)
     }
 }
 
-// Multiply or divide two factors.
+// Multiply or divide two factors
 template <class PType> void parser<PType>::eval_exp3(PType& result)
 {
     register char op;
@@ -168,7 +171,7 @@ template <class PType> void parser<PType>::eval_exp4(PType& result)
     }
 }
 
-// Evaluate a unary + or -.
+// Evaluate a unary + or -
 template <class PType> void parser<PType>::eval_exp5(PType& result)
 {
     register char  op;
@@ -186,7 +189,7 @@ template <class PType> void parser<PType>::eval_exp5(PType& result)
     }
 }
 
-// Process a parenthesized expression.
+// Process a parenthesized expression
 template <class PType> void parser<PType>::eval_exp6(PType& result)
 {
     if ((*token == '('))
@@ -202,7 +205,7 @@ template <class PType> void parser<PType>::eval_exp6(PType& result)
     else atom(result);
 }
 
-// Get the value of a number or a variable.
+// Get the value of a number or a variable
 template <class PType> void parser<PType>::atom(PType& result)
 {
     switch (tok_type)
@@ -220,7 +223,7 @@ template <class PType> void parser<PType>::atom(PType& result)
     }
 }
 
-// Return a token to the input stream.
+// Return a token to the input stream
 template <class PType> void parser<PType>::putback()
 {
     char* t;
@@ -231,19 +234,19 @@ template <class PType> void parser<PType>::putback()
     }
 }
 
-// Display a syntax error.
+// Display a syntax error
 template <class PType> void parser<PType>::serror(int error)
 {
     static char* e[] =
     {
-        "Syntax Error",
-        "Unbalanced Parentheses",
-        "No expression Present"
+        "Syntax error",
+        "Unbalanced parentheses",
+        "No expression present"
     };
     cout << e[error] << endl;
 }
 
-// Obtain the next token.
+// Obtain the next token
 template <class PType> void parser<PType>::get_token()
 {
     register char* temp;
@@ -270,19 +273,25 @@ template <class PType> void parser<PType>::get_token()
     }
     else if (isalpha(*exp_ptr))
     {
-        while (!isdelim(*exp_ptr)) *temp++ = *exp_ptr++;
+        while (!isdelim(*exp_ptr))
+        {
+            *temp++ = *exp_ptr++;
+        }
         tok_type = VARIABLE;
     }
     else if (isdigit(*exp_ptr))
     {
-        while (!isdelim(*exp_ptr)) *temp++ = *exp_ptr++;
+        while (!isdelim(*exp_ptr))
+        {
+            *temp++ = *exp_ptr++;
+        }
         tok_type = NUMBER;
     }
 
     *temp = '\0';
 }
 
-// Return true if c is a delimiter.
+// Return true if c is a delimiter
 template <class PType> int parser<PType>::isdelim(char c)
 {
     if (strchr(" +-/*%^=()", c) || c == 9 || c == '\r' || c == 0)
@@ -292,7 +301,7 @@ template <class PType> int parser<PType>::isdelim(char c)
     return 0;
 }
 
-// Return the value of a variable.
+// Return the value of a variable
 template <class PType> PType parser<PType>::find_var(char* s)
 {
     if (!isalpha(*s))
